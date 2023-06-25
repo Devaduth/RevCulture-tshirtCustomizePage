@@ -208,20 +208,18 @@
 										<hr>
 										<button class="btn btn-info" style="display:block;width:120px; height:30px;"
 											onclick="document.getElementById('fileToUpload1').click()">Image 1</button>
-										<input type="file" style="display: none;" onchange="changeImage1(event)"
+										<input type="file" style="display: none;" onchange="resize1(event)"
 											name="fileToUpload" id="fileToUpload1">
 										<br>
 										<button class="btn btn-info" style="display:block;width:120px; height:30px;"
-											onclick="document.getElementById('fileToUpload2').click()">Image 1</button>
-										<input type="file" style="display: none;" onchange="changeImage2(event)"
+											onclick="document.getElementById('fileToUpload2').click()">Image 2</button>
+										<input type="file" style="display: none;" onchange="resize2(event)"
 											name="fileToUpload" id="fileToUpload2">
-											<br>
-											<a type="button" class="btn btn-large btn-block btn-success" name="addToTheBag" id="canvasDownload">Download T-Shirt front <i
+										<br>
+										<a type="button" class="btn btn-large btn-block btn-success" name="addToTheBag"
+											id="canvasDownload">Download T-Shirt Facing side <i
 												class="icon-briefcase icon-white"></i>
-											</a>
-											<a type="button" class="btn btn-large btn-block btn-success" name="addToTheBag" id="canvasDownload2">Download T-Shirt back <i
-												class="icon-briefcase icon-white"></i>
-											</a>
+										</a>
 									</div>
 
 								</div>
@@ -321,7 +319,7 @@
 
 					<!--	/EDITOR		-->
 				</div>
-<!--
+				<!--
 				<div class="span3">
 					<div class="well">
 						<h3>Select Sizes</h3>
@@ -374,42 +372,120 @@
 		});
 	</script>
 
-<script>
+	<script>
 
-document.querySelector('#canvasDownload').addEventListener('click', function() {
-        html2canvas(document.querySelector('#shirtDiv'), {
-            onrendered: function(canvas) {
-                // document.body.appendChild(canvas);
-              return Canvas2Image.saveAsPNG(canvas);
-            }
-        });
-    });
-	
-	
-document.querySelector('#canvasDownload2').addEventListener('click', function() {
-        html2canvas(document.querySelector('#shirtBack'), {
-            onrendered: function(canvas) {
-                // document.body.appendChild(canvas);
-              return Canvas2Image.saveAsPNG(canvas);
-            }
-        });
-    });
-	
-</script>
+		document.querySelector('#canvasDownload').addEventListener('click', function () {
+			html2canvas(document.querySelector('#shirtDiv'), {
+				onrendered: function (canvas) {
+					// document.body.appendChild(canvas);
+					return Canvas2Image.saveAsPNG(canvas);
+				}
+			});
+		});
+
+
+	</script>
 	<!-- Le javascript
     ================================================== -->
 	<!-- Placed at the end of the document so the pages load faster -->
 
 	<script>
-		function changeImage1(event) {
-			let image = document.getElementById('tshirtImage1')
-			image.src = URL.createObjectURL(event.target.files[0])
-			image.style.display = 'flex';
+
+		function resize1(event) {
+
+			//define the width to resize e.g 600px
+			var resize_width = 180;//without px
+
+			//get the image selected
+			var item = document.querySelector("#fileToUpload1").files[0];;
+
+			//create a FileReader
+			var reader = new FileReader();
+
+			//image turned to base64-encoded Data URI.
+			reader.readAsDataURL(item);
+			reader.name = item.name;//get the image's name
+			reader.size = item.size; //get the image's size
+			reader.onload = function (event) {
+				var img = new Image();//create a image
+				img.src = event.target.result;//result is base64-encoded Data URI
+				img.name = event.target.name;//set name (optional)
+				img.size = event.target.size;//set size (optional)
+				img.onload = function (el) {
+					var elem = document.createElement('canvas');//create a canvas
+
+					//scale the image to 600 (width) and keep aspect ratio
+					var scaleFactor = resize_width / el.target.width;
+					elem.width = resize_width;
+					elem.height = el.target.height * scaleFactor;
+
+					//draw in canvas
+					var ctx = elem.getContext('2d');
+					ctx.drawImage(el.target, 0, 0, elem.width, elem.height);
+
+					//get the base64-encoded Data URI from the resize image
+					var srcEncoded = ctx.canvas.toDataURL('image/png', 1);
+
+					//assign it to thumb src
+					let image = document.getElementById('tshirtImage1')
+					image.src = srcEncoded
+					image.style.display = 'flex'
+					//document.querySelector('#tshirtImage1').src = srcEncoded;
+
+					/*Now you can send "srcEncoded" to the server and
+					convert it to a png o jpg. Also can send
+					"el.target.name" that is the file's name.*/
+
+				}
+			}
 		}
-		function changeImage2(event) {
-			let image = document.getElementById('tshirtImage2')
-			image.src = URL.createObjectURL(event.target.files[0])
-			image.style.display = 'flex';
+		function resize2(event) {
+
+			//define the width to resize e.g 600px
+			var resize_width = 180;//without px
+
+			//get the image selected
+			var item = document.querySelector("#fileToUpload2").files[0];;
+
+			//create a FileReader
+			var reader = new FileReader();
+
+			//image turned to base64-encoded Data URI.
+			reader.readAsDataURL(item);
+			reader.name = item.name;//get the image's name
+			reader.size = item.size; //get the image's size
+			reader.onload = function (event) {
+				var img = new Image();//create a image
+				img.src = event.target.result;//result is base64-encoded Data URI
+				img.name = event.target.name;//set name (optional)
+				img.size = event.target.size;//set size (optional)
+				img.onload = function (el) {
+					var elem = document.createElement('canvas');//create a canvas
+
+					//scale the image to 600 (width) and keep aspect ratio
+					var scaleFactor = resize_width / el.target.width;
+					elem.width = resize_width;
+					elem.height = el.target.height * scaleFactor;
+
+					//draw in canvas
+					var ctx = elem.getContext('2d');
+					ctx.drawImage(el.target, 0, 0, elem.width, elem.height);
+
+					//get the base64-encoded Data URI from the resize image
+					var srcEncoded = ctx.canvas.toDataURL('image/png', 1);
+
+					//assign it to thumb src
+					let image = document.getElementById('tshirtImage2')
+					image.src = srcEncoded
+					image.style.display = 'flex'
+					//document.querySelector('#tshirtImage1').src = srcEncoded;
+
+					/*Now you can send "srcEncoded" to the server and
+					convert it to a png o jpg. Also can send
+					"el.target.name" that is the file's name.*/
+
+				}
+			}
 		}
 		const canvasDownload = document.getElementById('canvasDownload')
 		const frontCanvas = document.getElementById('tcanvas')
